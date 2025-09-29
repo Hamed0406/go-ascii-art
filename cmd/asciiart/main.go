@@ -20,30 +20,29 @@ func resolveImagePath(imageName string) string {
 	if utils.FileExists(testdataPath) {
 		return testdataPath
 	}
-	return imageName // fallback, will error in converter
+	return imageName
 }
 
 func main() {
 	// CLI flags
 	width := flag.Uint("width", 80, "output width in characters")
-	color := flag.Bool("color", false, "enable ANSI color output (true/false)")
+	color := flag.Bool("color", false, "enable ANSI color output")
 	outFile := flag.String("out", "", "output file path (if empty, print to stdout)")
 	charset := flag.String("charset", "@%#*+=-:. ", "custom ASCII character ramp (dark→light)")
+	scaleY := flag.Float64("scaleY", 0.5, "vertical scaling factor (default 0.5 for aspect ratio)")
 
 	flag.Parse()
 
-	// Require image argument
 	if flag.NArg() < 1 {
 		fmt.Println("Usage: asciiart [options] <image-path>")
 		flag.PrintDefaults()
 		return
 	}
 
-	// Resolve image path
 	imagePath := resolveImagePath(flag.Arg(0))
 
 	// Run converter
-	result, err := ascii.ConvertImageToASCII(imagePath, *width, *color, *charset)
+	result, err := ascii.ConvertImageToASCII(imagePath, *width, *color, *charset, *scaleY)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(1)

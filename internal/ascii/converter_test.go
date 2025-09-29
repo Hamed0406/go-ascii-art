@@ -12,17 +12,18 @@ func TestConvertImageToASCII(t *testing.T) {
 		width    uint
 		useColor bool
 		charset  string
+		scaleY   float64
 		wantErr  bool
 	}{
-		{"valid grayscale default", "../../testdata/test.png", 40, false, "@%#*+=-:. ", false},
-		{"valid grayscale custom", "../../testdata/test.png", 40, false, " .:-=+*#%@", false},
-		{"valid color", "../../testdata/test.png", 40, true, "@%#*+=-:. ", false},
-		{"nonexistent file", "../../testdata/missing.png", 40, false, "@%#*+=-:. ", true},
+		{"grayscale default scale", "../../testdata/test.png", 40, false, "@%#*+=-:. ", 0.5, false},
+		{"grayscale custom scale", "../../testdata/test.png", 40, false, "@%#*+=-:. ", 1.0, false},
+		{"color mode", "../../testdata/test.png", 40, true, "@%#*+=-:. ", 0.5, false},
+		{"nonexistent file", "../../testdata/missing.png", 40, false, "@%#*+=-:. ", 0.5, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ConvertImageToASCII(tt.imgPath, tt.width, tt.useColor, tt.charset)
+			result, err := ConvertImageToASCII(tt.imgPath, tt.width, tt.useColor, tt.charset, tt.scaleY)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("expected error=%v, got %v", tt.wantErr, err)

@@ -3,36 +3,38 @@ package ascii
 import (
 	"fmt"
 	"image"
-	_ "image/jpeg" // enable JPEG decoding
-	_ "image/png"  // enable PNG decoding
+	_ "image/jpeg"
+	_ "image/png"
 	"os"
 
 	"github.com/nfnt/resize"
 )
 
-// ConvertImageToASCII loads an image, resizes it, and converts it to ASCII art.
-// - path: path to the image file
-// - width: target width in characters
-// - useColor: if true, ANSI color codes are used for output
-// - charset: character ramp for brightness mapping
-func ConvertImageToASCII(path string, width uint, useColor bool, charset string) (string, error) {
-	// Open file
+// ConvertImageToASCII loads an image, rescales it, and converts it to ASCII art.
+// - path: image file path
+// - width: output width in characters
+// - useColor: ANSI color output toggle
+// - charset: brightness mapping ramp
+// - scaleY: vertical scaling factor (default ~0.5 for terminals)
+func ConvertImageToASCII(path string, width uint, useColor bool, charset string, scaleY float64) (string, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to open image: %w", err)
 	}
 	defer file.Close()
 
-	// Decode image (JPEG/PNG supported by default)
 	img, _, err := image.Decode(file)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode image: %w", err)
 	}
 
-	// Resize to requested width (auto height)
-	resized := resize.Resize(width, 0, img, resize.Lanczos3)
+	// Calculate height with vertical scaling
+	origBounds := img.Bounds()
+	aspectHeight := uint(float64(origBounds.Dy()) * (float64(width) / float64(origBounds.Dx())) * scaleY)
 
-	// Convert depending on mode
+	// Resize using Lanczos3 interpolation
+	resized := resize.Resize(width, aspectHeight, img, resize.Lanczos3)
+
 	if useColor {
 		return imageToASCIIColor(resized), nil
 	}
