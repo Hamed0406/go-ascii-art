@@ -14,9 +14,12 @@ func TestMapBrightnessToChar(t *testing.T) {
 		{"brightest", 255},
 	}
 
+	// Use default charset for testing
+	chars := parseCharset("")
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := mapBrightnessToChar(tt.brightness)
+			r := mapBrightnessToChar(tt.brightness, chars)
 			if r == 0 {
 				t.Errorf("unexpected empty rune for brightness %d", tt.brightness)
 			}

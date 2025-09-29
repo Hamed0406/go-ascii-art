@@ -14,7 +14,8 @@ import (
 // - path: path to the image file
 // - width: target width in characters
 // - useColor: if true, ANSI color codes are used for output
-func ConvertImageToASCII(path string, width uint, useColor bool) (string, error) {
+// - charset: character ramp for brightness mapping
+func ConvertImageToASCII(path string, width uint, useColor bool, charset string) (string, error) {
 	// Open file
 	file, err := os.Open(path)
 	if err != nil {
@@ -35,5 +36,5 @@ func ConvertImageToASCII(path string, width uint, useColor bool) (string, error)
 	if useColor {
 		return imageToASCIIColor(resized), nil
 	}
-	return imageToASCII(resized), nil
+	return imageToASCII(resized, charset), nil
 }

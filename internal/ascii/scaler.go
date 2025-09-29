@@ -7,15 +7,17 @@ import (
 )
 
 // imageToASCII converts an image to grayscale ASCII art (no color).
-func imageToASCII(img image.Image) string {
+// Uses a custom charset for brightness mapping.
+func imageToASCII(img image.Image, charset string) string {
 	var builder strings.Builder
 	bounds := img.Bounds()
+	chars := parseCharset(charset)
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			r, g, b, _ := img.At(x, y).RGBA()
 			gray := uint8(0.299*float64(r>>8) + 0.587*float64(g>>8) + 0.114*float64(b>>8))
-			builder.WriteRune(mapBrightnessToChar(gray))
+			builder.WriteRune(mapBrightnessToChar(gray, chars))
 		}
 		builder.WriteString("\n")
 	}
@@ -34,11 +36,9 @@ func imageToASCIIColor(img image.Image) string {
 			R, G, B := r>>8, g>>8, b>>8
 
 			// ANSI escape code: \033[38;2;R;G;Bm sets foreground color
-			// Using "█" (full block) for better color representation
 			builder.WriteString(fmt.Sprintf("\033[38;2;%d;%d;%dm█", R, G, B))
 		}
-		// Reset colors + newline
-		builder.WriteString("\033[0m\n")
+		builder.WriteString("\033[0m\n") // reset colors
 	}
 	return builder.String()
 }

@@ -18,7 +18,7 @@ func TestImageToASCII(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// create a test image filled with gradient
+			// Create a test grayscale image
 			img := image.NewRGBA(image.Rect(0, 0, tt.width, tt.height))
 			for y := 0; y < tt.height; y++ {
 				for x := 0; x < tt.width; x++ {
@@ -27,7 +27,8 @@ func TestImageToASCII(t *testing.T) {
 				}
 			}
 
-			result := imageToASCII(img)
+			// Call new function signature (with charset)
+			result := imageToASCII(img, "@%#*+=-:. ")
 			if len(result) == 0 {
 				t.Error("expected ASCII output, got empty string")
 			}
